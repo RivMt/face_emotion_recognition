@@ -2,3 +2,6 @@ numpy
 opencv-python
 tensorflow
 matplotlib
+pandas
+pillow
+tqdm

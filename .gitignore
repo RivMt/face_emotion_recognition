@@ -162,4 +162,7 @@ cython_debug/
 .idea/
 
 # ML
-model.h5
+*.h5
+/prepare/data
+/prepare/raw
+/prepare/*.png
