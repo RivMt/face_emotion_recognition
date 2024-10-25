@@ -1,44 +1,25 @@
-import numpy as np
 import argparse
-import matplotlib.pyplot as plt
-from tensorflow.keras.models import Sequential
-from tensorflow.keras.layers import Dense, Dropout, Flatten
-from tensorflow.keras.layers import Conv2D
-from tensorflow.keras.optimizers import Adam
-from tensorflow.keras.layers import MaxPooling2D
-from tensorflow.keras.preprocessing.image import ImageDataGenerator
 import os
+
+import matplotlib.pyplot as plt
+import numpy as np
+from tensorflow.keras.optimizers import Adam
+from tensorflow.keras.preprocessing.image import ImageDataGenerator
 
 import model as md
 
-os.environ['TF_CPP_MIN_LOG_LEVEL'] = '2'
+# Init arguments
+parser = argparse.ArgumentParser()
+parser.add_argument('--test', action='store_true', default=False)
+parser.add_argument('--cli', action='store_true', default=False)
+parser.add_argument('--batch', action='store', default=64, type=int)
+parser.add_argument('--epoch', action='store', default=50, type=int)
+parser.add_argument('--output', action='store', default='./output', type=str)
+args = parser.parse_args()
+test_mode = args.test
 
-
-
-# plots accuracy and loss curves
-def plot_model_history(model_history):
-    """
-    Plot Accuracy and Loss curves given the model_history
-    """
-    fig, axs = plt.subplots(1,2,figsize=(15,5))
-    # summarize history for accuracy
-    axs[0].plot(range(1,len(model_history.history['accuracy'])+1),model_history.history['accuracy'])
-    axs[0].plot(range(1,len(model_history.history['val_accuracy'])+1),model_history.history['val_accuracy'])
-    axs[0].set_title('Model Accuracy')
-    axs[0].set_ylabel('Accuracy')
-    axs[0].set_xlabel('Epoch')
-    axs[0].set_xticks(np.arange(1,len(model_history.history['accuracy'])+1),len(model_history.history['accuracy'])/10)
-    axs[0].legend(['train', 'val'], loc='best')
-    # summarize history for loss
-    axs[1].plot(range(1,len(model_history.history['loss'])+1),model_history.history['loss'])
-    axs[1].plot(range(1,len(model_history.history['val_loss'])+1),model_history.history['val_loss'])
-    axs[1].set_title('Model Loss')
-    axs[1].set_ylabel('Loss')
-    axs[1].set_xlabel('Epoch')
-    axs[1].set_xticks(np.arange(1,len(model_history.history['loss'])+1),len(model_history.history['loss'])/10)
-    axs[1].legend(['train', 'val'], loc='best')
-    fig.savefig('prepare/data/plot.png')
-    plt.show()
+# Set log level
+os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3' if args.cli else '2'
 
 # Define data generators
 train_dir = 'prepare/data/train'
@@ -46,8 +27,8 @@ val_dir = 'prepare/data/test'
 
 num_train = sum([len(os.listdir(os.path.join(train_dir, d))) for d in os.listdir(train_dir)])
 num_val = sum([len(os.listdir(os.path.join(val_dir, d))) for d in os.listdir(val_dir)])
-batch_size = 64
-num_epoch = 50
+batch_size = args.batch
+num_epoch = 2 if test_mode else args.epoch
 print(f"Initialize learning: Train={num_train}, Val={num_val}")
 
 train_datagen = ImageDataGenerator(rescale=1./255)
@@ -67,6 +48,33 @@ validation_generator = val_datagen.flow_from_directory(
         color_mode="grayscale",
         class_mode='categorical')
 
+
+# plots accuracy and loss curves
+def plot_model_history(model_history):
+    """
+    Plot Accuracy and Loss curves given the model_history
+    """
+    fig, axs = plt.subplots(1,2,figsize=(15,5))
+    # summarize history for accuracy
+    axs[0].plot(range(1,len(model_history.history['accuracy'])+1),model_history.history['accuracy'])
+    axs[0].plot(range(1,len(model_history.history['val_accuracy'])+1),model_history.history['val_accuracy'])
+    axs[0].set_title('Model Accuracy')
+    axs[0].set_ylabel('Accuracy')
+    axs[0].set_xlabel('Epoch')
+    axs[0].set_xticks(np.arange(1,len(model_history.history['accuracy'])+1))
+    axs[0].legend(['train', 'val'], loc='best')
+    # summarize history for loss
+    axs[1].plot(range(1,len(model_history.history['loss'])+1),model_history.history['loss'])
+    axs[1].plot(range(1,len(model_history.history['val_loss'])+1),model_history.history['val_loss'])
+    axs[1].set_title('Model Loss')
+    axs[1].set_ylabel('Loss')
+    axs[1].set_xlabel('Epoch')
+    axs[1].set_xticks(np.arange(1,len(model_history.history['loss'])+1))
+    axs[1].legend(['train', 'val'], loc='best')
+    fig.savefig(f'{args.output}/plot{batch_size}-{num_epoch}.png')
+    if not args.cli:
+        plt.show()
+
 # Create the model
 model = md.getModel()
 
@@ -78,5 +86,5 @@ model_info = model.fit(
         epochs=num_epoch,
         validation_data=validation_generator,
         validation_steps=num_val // batch_size)
-model.save_weights('model.weights.h5')
+model.save_weights(f'{args.output}/model{batch_size}-{num_epoch}.weights.h5')
 plot_model_history(model_info)

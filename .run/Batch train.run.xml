@@ -1,0 +1,6 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="Batch train" type="PowerShellRunType" factoryName="PowerShell" scriptUrl="C:\Users\sanka\Documents\Projects\face_emotion_recognition\batch_train.ps1" executablePath="$PROJECT_DIR$/../../../../../Program Files/PowerShell/7/pwsh.exe">
+    <envs />
+    <method v="2" />
+  </configuration>
+</component>
