@@ -2,8 +2,6 @@ import numpy as np
 import cv2
 import copy
 
-from numpy.lib.function_base import iterable
-
 import model as md
 from constants import emotion_dict
 from evaluate import evaluate
