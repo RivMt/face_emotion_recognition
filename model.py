@@ -4,7 +4,7 @@ from tensorflow.keras.layers import Conv2D
 from tensorflow.keras.layers import MaxPooling2D
 import os
 
-def getModel():
+def get_cnn_model():
     model = Sequential()
 
     model.add(Conv2D(32, kernel_size=(3, 3), activation='relu', input_shape=(48,48,1)))

@@ -1,12 +1,11 @@
 import argparse
 import os
 
-import matplotlib.pyplot as plt
-import numpy as np
 from tensorflow.keras.optimizers import Adam
 from tensorflow.keras.preprocessing.image import ImageDataGenerator
 
 import model as md
+from plot import plot_model_history
 
 # Init arguments
 parser = argparse.ArgumentParser()
@@ -48,35 +47,8 @@ validation_generator = val_datagen.flow_from_directory(
         color_mode="grayscale",
         class_mode='categorical')
 
-
-# plots accuracy and loss curves
-def plot_model_history(model_history):
-    """
-    Plot Accuracy and Loss curves given the model_history
-    """
-    fig, axs = plt.subplots(1,2,figsize=(15,5))
-    # summarize history for accuracy
-    axs[0].plot(range(1,len(model_history.history['accuracy'])+1),model_history.history['accuracy'])
-    axs[0].plot(range(1,len(model_history.history['val_accuracy'])+1),model_history.history['val_accuracy'])
-    axs[0].set_title('Model Accuracy')
-    axs[0].set_ylabel('Accuracy')
-    axs[0].set_xlabel('Epoch')
-    axs[0].set_xticks(np.arange(1,len(model_history.history['accuracy'])+1))
-    axs[0].legend(['train', 'val'], loc='best')
-    # summarize history for loss
-    axs[1].plot(range(1,len(model_history.history['loss'])+1),model_history.history['loss'])
-    axs[1].plot(range(1,len(model_history.history['val_loss'])+1),model_history.history['val_loss'])
-    axs[1].set_title('Model Loss')
-    axs[1].set_ylabel('Loss')
-    axs[1].set_xlabel('Epoch')
-    axs[1].set_xticks(np.arange(1,len(model_history.history['loss'])+1))
-    axs[1].legend(['train', 'val'], loc='best')
-    fig.savefig(f'{args.output}/plot{batch_size}-{num_epoch}.png')
-    if not args.cli:
-        plt.show()
-
 # Create the model
-model = md.getModel()
+model = md.get_cnn_model()
 
 # If you want to train the same model or try other models, go for this
 model.compile(loss='categorical_crossentropy',optimizer=Adam(learning_rate=0.0001, decay=1e-6),metrics=['accuracy'])
@@ -87,4 +59,4 @@ model_info = model.fit(
         validation_data=validation_generator,
         validation_steps=num_val // batch_size)
 model.save_weights(f'{args.output}/model{batch_size}-{num_epoch}.weights.h5')
-plot_model_history(model_info)
+plot_model_history(model_info, display=not args.cli, filename=f"plot{batch_size}-{num_epoch}.png")

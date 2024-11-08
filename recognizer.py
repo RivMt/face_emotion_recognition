@@ -6,7 +6,7 @@ import model as md
 from constants import emotion_dict
 from evaluate import evaluate
 
-model = md.getModel()
+model = md.get_cnn_model()
 
 model.load_weights('model.weights.h5')
 
