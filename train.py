@@ -61,6 +61,7 @@ def plot_model_history(model_history):
     axs[0].set_title('Model Accuracy')
     axs[0].set_ylabel('Accuracy')
     axs[0].set_xlabel('Epoch')
+    axs[0].set_ylim(0, 1)
     axs[0].set_xticks(np.arange(1,len(model_history.history['accuracy'])+1))
     axs[0].legend(['train', 'val'], loc='best')
     # summarize history for loss

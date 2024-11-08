@@ -1,5 +1,5 @@
 $batch = $args[0]
-$epochs = 20..50
+$epochs = 20..60
 
 # Load Python venv
 .\venv\Scripts\activate.ps1
