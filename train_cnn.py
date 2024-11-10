@@ -4,7 +4,7 @@ import os
 from tensorflow.keras.optimizers import Adam
 from tensorflow.keras.preprocessing.image import ImageDataGenerator
 
-import model as md
+import model_cnn as md
 from plot import plot_model_history
 
 # Init arguments
@@ -48,7 +48,7 @@ validation_generator = val_datagen.flow_from_directory(
         class_mode='categorical')
 
 # Create the model
-model = md.get_cnn_model()
+model = md.get_model()
 
 # If you want to train the same model or try other models, go for this
 model.compile(loss='categorical_crossentropy',optimizer=Adam(learning_rate=0.0001, decay=1e-6),metrics=['accuracy'])

@@ -2,9 +2,8 @@ from tensorflow.keras.models import Sequential
 from tensorflow.keras.layers import Dense, Dropout, Flatten
 from tensorflow.keras.layers import Conv2D
 from tensorflow.keras.layers import MaxPooling2D
-import os
 
-def get_cnn_model():
+def get_model():
     model = Sequential()
 
     model.add(Conv2D(32, kernel_size=(3, 3), activation='relu', input_shape=(48,48,1)))
@@ -23,3 +22,5 @@ def get_cnn_model():
     model.add(Dropout(0.5))
     model.add(Dense(7, activation='softmax'))
     return model
+
+
