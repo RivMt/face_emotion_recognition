@@ -5,6 +5,7 @@ import copy
 import model as md
 from constants import emotion_dict
 from evaluate import evaluate
+import send
 
 model = md.getModel()
 
@@ -59,6 +60,7 @@ while True:
             cv2.putText(frame, t, (x-20, y-60), cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 0, 0), 2, cv2.LINE_AA)
             t = f"Cands: {emotion_dict[first]} / {emotion_dict[second]}"
             cv2.putText(frame, t, (x-20, y+h-60), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 2, cv2.LINE_AA)
+            send.send(f"Emotions {t}")
 
     cv2.imshow('Video', cv2.resize(frame,(width, height), interpolation = cv2.INTER_CUBIC))
     if cv2.waitKey(1) & 0xFF == ord('q'):
