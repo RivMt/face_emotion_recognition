@@ -1,6 +1,7 @@
 import argparse
 import os
 
+from sklearn.utils import class_weight
 import matplotlib.pyplot as plt
 import numpy as np
 from tensorflow.keras.optimizers import Adam
@@ -42,6 +43,10 @@ train_generator = train_datagen.flow_from_directory(
     class_mode="binary",
     follow_links=True,
 )
+print(train_generator.class_indices)
+print(train_generator.classes)
+print(f"Class 0 samples: {sum(train_generator.classes == 0)}")
+print(f"Class 1 samples: {sum(train_generator.classes == 1)}")
 
 validation_generator = val_datagen.flow_from_directory(
     val_dir,
@@ -89,12 +94,19 @@ model.compile(
     optimizer=Adam(learning_rate=0.0001, decay=1e-6),
     metrics=['accuracy'],
 )
+class_weights = class_weight.compute_class_weight(
+    class_weight='balanced',
+    classes=np.unique(train_generator.classes),
+    y=train_generator.classes
+)
+class_weights = dict(enumerate(class_weights))
 model_info = model.fit(
     train_generator,
     steps_per_epoch=num_train // batch_size,
     epochs=num_epoch,
     validation_data=validation_generator,
     validation_steps=num_val // batch_size,
+    class_weight=class_weights,
 )
 model.save_weights(f'{args.output}/bin/model{batch_size}-{num_epoch}.weights.h5')
 plot_model_history(model_info)

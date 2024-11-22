@@ -8,7 +8,7 @@ from evaluate import evaluate
 
 model = md.getModel()
 
-model.load_weights('model.weights.h5')
+model.load_weights('output/bin/model64-50.weights.h5')
 
 cascades = [
     'haarcascade_frontalface_default.xml',
@@ -49,16 +49,11 @@ while True:
             roi_gray = gray[y:y + h, x:x + w]
             cropped_img = np.expand_dims(np.expand_dims(cv2.resize(roi_gray, (48, 48)), -1), 0)
             prediction = model.predict(cropped_img)
-            first = int(np.argmax(prediction))
-            second = (np.argsort(prediction[0])[::-1])[1]
-            for i in range(len(prediction[0])):
-                t = emotion_dict[i] + f": {prediction[0][i]*100:.2f}"
-                cv2.putText(frame, t, (0, font_size + i*font_size), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 0, 255), 2, cv2.LINE_AA)
+            t = f"Anger: {prediction[0][0]:.2f}"
+            cv2.putText(frame, t, (0, font_size + font_size), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 0, 255), 2, cv2.LINE_AA)
             ev = evaluate(prediction[0])
             t = f"General: {ev*100:.2f}"
             cv2.putText(frame, t, (x-20, y-60), cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 0, 0), 2, cv2.LINE_AA)
-            t = f"Cands: {emotion_dict[first]} / {emotion_dict[second]}"
-            cv2.putText(frame, t, (x-20, y+h-60), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 2, cv2.LINE_AA)
 
     cv2.imshow('Video', cv2.resize(frame,(width, height), interpolation = cv2.INTER_CUBIC))
     if cv2.waitKey(1) & 0xFF == ord('q'):
