@@ -1,5 +1,5 @@
 $batch = $args[0]
-$epochs = 20..60
+$epochs = 20..60 | Where-Object { $_ % 2 -eq 0 }
 
 # Load Python venv
 .\venv\Scripts\activate.ps1
