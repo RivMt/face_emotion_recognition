@@ -22,8 +22,8 @@ test_mode = args.test
 os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3' if args.cli else '2'
 
 # Define data generators
-train_dir = 'prepare/data/train'
-val_dir = 'prepare/data/test'
+train_dir = 'prepare/data/bin-train'
+val_dir = 'prepare/data/bin-test'
 
 num_train = sum([len(os.listdir(os.path.join(train_dir, d))) for d in os.listdir(train_dir)])
 num_val = sum([len(os.listdir(os.path.join(val_dir, d))) for d in os.listdir(val_dir)])
@@ -35,18 +35,22 @@ train_datagen = ImageDataGenerator(rescale=1./255)
 val_datagen = ImageDataGenerator(rescale=1./255)
 
 train_generator = train_datagen.flow_from_directory(
-        train_dir,
-        target_size=(48,48),
-        batch_size=batch_size,
-        color_mode="grayscale",
-        class_mode='categorical')
+    train_dir,
+    target_size=(48,48),
+    batch_size=batch_size,
+    color_mode="grayscale",
+    class_mode="binary",
+    follow_links=True,
+)
 
 validation_generator = val_datagen.flow_from_directory(
-        val_dir,
-        target_size=(48,48),
-        batch_size=batch_size,
-        color_mode="grayscale",
-        class_mode='categorical')
+    val_dir,
+    target_size=(48,48),
+    batch_size=batch_size,
+    color_mode="grayscale",
+    class_mode="binary",
+    follow_links=True,
+)
 
 
 # plots accuracy and loss curves
@@ -72,7 +76,7 @@ def plot_model_history(model_history):
     axs[1].set_xlabel('Epoch')
     axs[1].set_xticks(np.arange(1,len(model_history.history['loss'])+1))
     axs[1].legend(['train', 'val'], loc='best')
-    fig.savefig(f'{args.output}/plot{batch_size}-{num_epoch}.png')
+    fig.savefig(f'{args.output}/bin/plot{batch_size}-{num_epoch}.png')
     if not args.cli:
         plt.show()
 
@@ -80,12 +84,17 @@ def plot_model_history(model_history):
 model = md.getModel()
 
 # If you want to train the same model or try other models, go for this
-model.compile(loss='categorical_crossentropy',optimizer=Adam(learning_rate=0.0001, decay=1e-6),metrics=['accuracy'])
+model.compile(
+    loss='binary_crossentropy',
+    optimizer=Adam(learning_rate=0.0001, decay=1e-6),
+    metrics=['accuracy'],
+)
 model_info = model.fit(
-        train_generator,
-        steps_per_epoch=num_train // batch_size,
-        epochs=num_epoch,
-        validation_data=validation_generator,
-        validation_steps=num_val // batch_size)
-model.save_weights(f'{args.output}/model{batch_size}-{num_epoch}.weights.h5')
+    train_generator,
+    steps_per_epoch=num_train // batch_size,
+    epochs=num_epoch,
+    validation_data=validation_generator,
+    validation_steps=num_val // batch_size,
+)
+model.save_weights(f'{args.output}/bin/model{batch_size}-{num_epoch}.weights.h5')
 plot_model_history(model_info)

@@ -21,5 +21,8 @@ def getModel():
     model.add(Flatten())
     model.add(Dense(1024, activation='relu'))
     model.add(Dropout(0.5))
-    model.add(Dense(7, activation='softmax'))
+    model.add(Dense(1, activation='sigmoid'))
     return model
+
+def custom_label(label):
+    return 0 if label != "angry"  else 1
