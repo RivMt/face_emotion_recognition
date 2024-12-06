@@ -1,0 +1,7 @@
+{
+  "host_address": "0.0.0.0",
+  "target_address": "localhost",
+  "port": 8080,
+  "buffer_size": 1024,
+  "timeout": 1.0
+}
